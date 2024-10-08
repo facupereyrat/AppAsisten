@@ -1,0 +1,31 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.11.35312.102
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AppAsisten.Server", "AppAsisten\AppAsisten.Server.csproj", "{4F4BE414-1F6B-4282-A6BA-87583807E133}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AppAsisten.BD", "AppAsisten.BD\AppAsisten.BD.csproj", "{6500F580-0EFE-4F0B-9A60-FB72946266BB}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{4F4BE414-1F6B-4282-A6BA-87583807E133}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{4F4BE414-1F6B-4282-A6BA-87583807E133}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{4F4BE414-1F6B-4282-A6BA-87583807E133}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{4F4BE414-1F6B-4282-A6BA-87583807E133}.Release|Any CPU.Build.0 = Release|Any CPU
+		{6500F580-0EFE-4F0B-9A60-FB72946266BB}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{6500F580-0EFE-4F0B-9A60-FB72946266BB}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{6500F580-0EFE-4F0B-9A60-FB72946266BB}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{6500F580-0EFE-4F0B-9A60-FB72946266BB}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {C95EEB02-5F7F-43A1-88C8-CCB3837E4763}
+	EndGlobalSection
+EndGlobal
