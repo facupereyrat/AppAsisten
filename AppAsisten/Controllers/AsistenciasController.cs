@@ -18,14 +18,14 @@ namespace AppAsisten.Controllers
             this.context = context;
         }
 
-        // 
+        // Obtener todas las asisten
         [HttpGet]
         public async Task<ActionResult<IEnumerable<Asistencia>>> GetAsistencias()
         {
             return await context.Asistencias.Include(a => a.Miembro).ToListAsync();
         }
 
-        // 
+        // Asistencia por id
         [HttpGet("{id}")]
         public async Task<ActionResult<Asistencia>> GetAsistencia(int id)
         {
@@ -39,7 +39,7 @@ namespace AppAsisten.Controllers
             return asistencia;
         }
 
-        // 
+        // Metodo para crear asist
         [HttpPost]
         public async Task<ActionResult<Asistencia>> PostAsistencia(Asistencia asistencia)
         {
@@ -49,7 +49,7 @@ namespace AppAsisten.Controllers
             return CreatedAtAction(nameof(GetAsistencia), new { id = asistencia.Id }, asistencia); 
         }
 
-        // 
+        // Actualizar asist existente
         [HttpPut("{id}")]
         public async Task<IActionResult> PutAsistencia(int id, Asistencia asistencia)
         {
@@ -79,7 +79,7 @@ namespace AppAsisten.Controllers
             return NoContent();
         }
 
-        // Eliminar asistencia
+        // Eliminar asistencia por id
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteAsistencia(int id)
         {
@@ -90,7 +90,7 @@ namespace AppAsisten.Controllers
             }
 
             context.Asistencias.Remove(asistencia);
-            await context.SaveChangesAsync();
+            await context.SaveChangesAsync(); //guarda cambios en bd
 
             return NoContent();
         }
