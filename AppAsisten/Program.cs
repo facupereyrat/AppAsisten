@@ -1,20 +1,26 @@
 using AppAsisten.BD.Data;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
-
 builder.Services.AddControllers();
-// Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
+
+// Configuración de Swagger/OpenAPI para desarrollo
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
-builder.Services.AddDbContext<Context>(op => op.UseSqlServer("name=conn"));
+// Obtener la cadena de conexión desde el archivo de configuración (appsettings.json)
+var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
+
+// Configuración de DbContext para Entity Framework
+builder.Services.AddDbContext<Context>(options =>
+    options.UseSqlServer(connectionString));
 
 var app = builder.Build();
 
-// Configure the HTTP request pipeline.
+// Configuración del pipeline HTTP
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
@@ -22,9 +28,8 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
-
 app.UseAuthorization();
-
 app.MapControllers();
 
+// Ejecutar la aplicación
 app.Run();

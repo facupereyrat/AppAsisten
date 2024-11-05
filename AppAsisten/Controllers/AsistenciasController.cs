@@ -1,35 +1,58 @@
 ﻿using AppAsisten.BD.Data;
+using AppAsisten.BD.Data.Entity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using AppAsisten.BD.Data.Entity; 
-using System.Collections.Generic;
 using System.Threading.Tasks;
 
 namespace AppAsisten.Controllers
 {
     [ApiController]
-    [Route("api/Asistencias")]
+    [Route("api/[controller]")]
     public class AsistenciasController : ControllerBase
     {
-        private readonly Context context; 
+        private readonly Context _context;
 
         public AsistenciasController(Context context)
         {
-            this.context = context;
+            _context = context;
         }
 
-        // Obtener todas las asisten
-        [HttpGet]
-        public async Task<ActionResult<IEnumerable<Asistencia>>> GetAsistencias()
+        // POST: api/Asistencias
+        [HttpPost]
+        public async Task<ActionResult<Asistencia>> PostAsistencia(Asistencia asistencia)
         {
-            return await context.Asistencias.Include(a => a.Miembro).ToListAsync();
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+
+            // Verificar si el miembro existe
+            var miembro = await _context.Miembros.FindAsync(asistencia.MiembroId);
+            if (miembro == null)
+            {
+                return NotFound("Miembro no encontrado.");
+            }
+
+            // Registrar entrada (si no se ha hecho)
+            if (asistencia.Entrada == default)
+            {
+                asistencia.Entrada = DateTime.Now;
+            }
+
+            _context.Asistencias.Add(asistencia);
+            await _context.SaveChangesAsync();
+
+            // Devolver la URL del recurso creado
+            return CreatedAtAction(nameof(GetAsistencia), new { id = asistencia.Id }, asistencia);
         }
 
-        // Asistencia por id
+        // GET: api/Asistencias/5
         [HttpGet("{id}")]
         public async Task<ActionResult<Asistencia>> GetAsistencia(int id)
         {
-            var asistencia = await context.Asistencias.Include(a => a.Miembro).MinAsync();
+            var asistencia = await _context.Asistencias
+                .Include(a => a.Miembro)  // Incluir información del miembro
+                .FirstOrDefaultAsync(a => a.Id == id);
 
             if (asistencia == null)
             {
@@ -39,65 +62,30 @@ namespace AppAsisten.Controllers
             return asistencia;
         }
 
-        // Metodo para crear asist
-        [HttpPost]
-        public async Task<ActionResult<Asistencia>> PostAsistencia(Asistencia asistencia)
-        {
-            context.Asistencias.Add(asistencia);
-            await context.SaveChangesAsync();
-
-            return CreatedAtAction(nameof(GetAsistencia), new { id = asistencia.Id }, asistencia); 
-        }
-
-        // Actualizar asist existente
+        // PUT: api/Asistencias/5
         [HttpPut("{id}")]
         public async Task<IActionResult> PutAsistencia(int id, Asistencia asistencia)
         {
-            if (id != asistencia.Id) 
+            if (id != asistencia.Id)
             {
                 return BadRequest();
             }
 
-            context.Entry(asistencia).State = EntityState.Modified;
-
-            try
-            {
-                await context.SaveChangesAsync();
-            }
-            catch (DbUpdateConcurrencyException)
-            {
-                if (!AsistenciaExists(id))
-                {
-                    return NotFound();
-                }
-                else
-                {
-                    throw;
-                }
-            }
-
-            return NoContent();
-        }
-
-        // Eliminar asistencia por id
-        [HttpDelete("{id}")]
-        public async Task<IActionResult> DeleteAsistencia(int id)
-        {
-            var asistencia = await context.Asistencias.FindAsync(id);
-            if (asistencia == null)
+            var asistenciaExistente = await _context.Asistencias.FindAsync(id);
+            if (asistenciaExistente == null)
             {
                 return NotFound();
             }
 
-            context.Asistencias.Remove(asistencia);
-            await context.SaveChangesAsync(); //guarda cambios en bd
+            // Registrar salida
+            if (asistenciaExistente.Salida == null && asistencia.Salida.HasValue)
+            {
+                asistenciaExistente.Salida = DateTime.Now;
+            }
+
+            await _context.SaveChangesAsync();
 
             return NoContent();
-        }
-
-        private bool AsistenciaExists(int id)
-        {
-            return context.Asistencias.Any(e => e.Id == id); 
         }
     }
 }
