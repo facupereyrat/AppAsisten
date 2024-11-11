@@ -1,124 +1,71 @@
-﻿using AppAsisten.BD.Data;
-using AppAsisten.BD.Data.Entity;
+﻿using AppAsisten.BD.Data.Entity;
+using AppAsisten.BD.Data;
+using AppAsisten.Shared.DTO;
+using AutoMapper;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 
-namespace AppAsisten.Controllers
+[Route("api/Miembro")]
+[ApiController]
+public class MiembroController : ControllerBase
 {
-    [ApiController]
-    [Route("api/[controller]")]
-    public class MiembrosController : ControllerBase
+    private readonly Context context;
+    private readonly IMapper mapper;
+
+    public MiembroController(Context context, IMapper mapper)
     {
-        private readonly Context _context;
+        this.context = context;
+        this.mapper = mapper;
+    }
 
-        public MiembrosController(Context context)
+    // Endpoint para crear un nuevo miembro
+    [HttpPost("registrar-miembro")]
+    public async Task<IActionResult> RegistrarMiembro([FromBody] MiembroDTO miembroDTO)
+    {
+        if (await context.Miembros.AnyAsync(m => m.CodigoQR == miembroDTO.CodigoQR))
         {
-            _context = context;
+            return BadRequest("Ya existe un miembro con este código QR.");
         }
 
-        // GET: api/Miembros
-        [HttpGet]
-        public async Task<ActionResult<IEnumerable<Miembro>>> GetMiembros()
+        var miembro = mapper.Map<Miembro>(miembroDTO);
+        context.Miembros.Add(miembro);
+        await context.SaveChangesAsync();
+
+        var result = mapper.Map<MiembroDTO>(miembro);
+        return Ok(result);
+    }
+
+    // Endpoint para obtener un miembro por su código QR
+    [HttpGet("obtener-miembro/{codigoQR}")]
+    public async Task<IActionResult> ObtenerMiembro(string codigoQR)
+    {
+        var miembro = await context.Miembros
+            .FirstOrDefaultAsync(m => m.CodigoQR == codigoQR);
+
+        if (miembro == null)
         {
-            return await _context.Miembros
-                .Include(m => m.Asistencias)  // Incluir las asistencias relacionadas
-                .ToListAsync();
+            return NotFound("Miembro no encontrado.");
         }
 
-        // GET: api/Miembros/5
-        [HttpGet("{id}")]
-        public async Task<ActionResult<Miembro>> GetMiembro(int id)
+        var miembroDTO = mapper.Map<MiembroDTO>(miembro);
+        return Ok(miembroDTO);
+    }
+
+    // Endpoint para desactivar un miembro (por ejemplo, si está suspendido)
+    [HttpPut("desactivar-miembro/{id}")]
+    public async Task<IActionResult> DesactivarMiembro(int id)
+    {
+        var miembro = await context.Miembros.FindAsync(id);
+
+        if (miembro == null)
         {
-            var miembro = await _context.Miembros
-                .Include(m => m.Asistencias)
-                .FirstOrDefaultAsync(m => m.Id == id);
-
-            if (miembro == null)
-            {
-                return NotFound();
-            }
-
-            return miembro;
+            return NotFound("Miembro no encontrado.");
         }
 
-        // POST: api/Miembros
-        [HttpPost]
-        public async Task<ActionResult<Miembro>> PostMiembro(Miembro miembro)
-        {
-            if (!ModelState.IsValid)
-            {
-                return BadRequest(ModelState);
-            }
+        miembro.EstaActivo = false;
+        context.Miembros.Update(miembro);
+        await context.SaveChangesAsync();
 
-            // Asignamos la fecha de registro si no se asignó
-            if (miembro.FechaRegistro == default)
-            {
-                miembro.FechaRegistro = DateTime.Now;
-            }
-
-            _context.Miembros.Add(miembro);
-            await _context.SaveChangesAsync();
-
-            return CreatedAtAction(nameof(GetMiembro), new { id = miembro.Id }, miembro);
-        }
-
-        // PUT: api/Miembros/5
-        [HttpPut("{id}")]
-        public async Task<IActionResult> PutMiembro(int id, Miembro miembro)
-        {
-            if (id != miembro.Id)
-            {
-                return BadRequest();
-            }
-
-            if (!ModelState.IsValid)
-            {
-                return BadRequest(ModelState);
-            }
-
-            _context.Entry(miembro).State = EntityState.Modified;
-
-            try
-            {
-                await _context.SaveChangesAsync();
-            }
-            catch (DbUpdateConcurrencyException)
-            {
-                if (!MiembroExists(id))
-                {
-                    return NotFound();
-                }
-                else
-                {
-                    throw;
-                }
-            }
-
-            return NoContent();
-        }
-
-        // DELETE: api/Miembros/5
-        [HttpDelete("{id}")]
-        public async Task<IActionResult> DeleteMiembro(int id)
-        {
-            var miembro = await _context.Miembros.FindAsync(id);
-            if (miembro == null)
-            {
-                return NotFound();
-            }
-
-            _context.Miembros.Remove(miembro);
-            await _context.SaveChangesAsync();
-
-            return NoContent();
-        }
-
-        private bool MiembroExists(int id)
-        {
-            return _context.Miembros.Any(e => e.Id == id);
-        }
+        return Ok();
     }
 }

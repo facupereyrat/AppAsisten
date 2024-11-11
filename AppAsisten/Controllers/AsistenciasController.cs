@@ -1,91 +1,86 @@
 ﻿using AppAsisten.BD.Data;
 using AppAsisten.BD.Data.Entity;
+using AppAsisten.Shared.DTO;
+using AutoMapper;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using System.Threading.Tasks;
+
 
 namespace AppAsisten.Controllers
 {
+    [Route("api/Asistencia")]
     [ApiController]
-    [Route("api/[controller]")]
-    public class AsistenciasController : ControllerBase
+    public class AsistenciaController : ControllerBase
     {
-        private readonly Context _context;
+        private readonly Context context;
+        private readonly IMapper mapper;
 
-        public AsistenciasController(Context context)
+        public AsistenciaController(Context context, IMapper mapper)
         {
-            _context = context;
+            this.context = context;
+            this.mapper = mapper;
         }
 
-        // POST: api/Asistencias
-        [HttpPost]
-        public async Task<ActionResult<Asistencia>> PostAsistencia(Asistencia asistencia)
+        // Registrar Entrada
+        [HttpPost("entrada")]
+        public async Task<IActionResult> RegistrarEntrada([FromBody] string codigoQR)
         {
-            if (!ModelState.IsValid)
-            {
-                return BadRequest(ModelState);
-            }
+            var miembro = await context.Miembros
+                .FirstOrDefaultAsync(m => m.CodigoQR == codigoQR);
 
-            // Verificar si el miembro existe
-            var miembro = await _context.Miembros.FindAsync(asistencia.MiembroId);
             if (miembro == null)
             {
-                return NotFound("Miembro no encontrado.");
+                return BadRequest("Código QR no válido.");
             }
 
-            // Registrar entrada (si no se ha hecho)
-            if (asistencia.Entrada == default)
+            var asistencia = new Asistencia
             {
-                asistencia.Entrada = DateTime.Now;
-            }
+                MiembroId = miembro.Id,
+                Entrada = DateTime.Now
+            };
 
-            _context.Asistencias.Add(asistencia);
-            await _context.SaveChangesAsync();
+            context.Asistencias.Add(asistencia);
+            await context.SaveChangesAsync();
 
-            // Devolver la URL del recurso creado
-            return CreatedAtAction(nameof(GetAsistencia), new { id = asistencia.Id }, asistencia);
+            // Devolver tanto la asistencia como los detalles del miembro
+            var miembroDto = mapper.Map<MiembroDTO>(miembro);
+            var asistenciaDto = mapper.Map<AsistenciaDTO>(asistencia);
+
+            return Ok(new { Asistencia = asistenciaDto, Miembro = miembroDto });
         }
 
-        // GET: api/Asistencias/5
-        [HttpGet("{id}")]
-        public async Task<ActionResult<Asistencia>> GetAsistencia(int id)
+        // Registrar Salida
+        [HttpPost("salida")]
+        public async Task<IActionResult> RegistrarSalida([FromBody] string codigoQR)
         {
-            var asistencia = await _context.Asistencias
-                .Include(a => a.Miembro)  // Incluir información del miembro
-                .FirstOrDefaultAsync(a => a.Id == id);
+            var miembro = await context.Miembros
+                .FirstOrDefaultAsync(m => m.CodigoQR == codigoQR);
+
+            if (miembro == null)
+            {
+                return BadRequest("Código QR no válido.");
+            }
+
+            var asistencia = await context.Asistencias
+                .Where(a => a.Miembro.CodigoQR == codigoQR)
+                .OrderByDescending(a => a.Entrada)   
+                .LastOrDefaultAsync();
+
 
             if (asistencia == null)
             {
-                return NotFound();
+                return BadRequest("No se ha registrado una entrada para este miembro.");
             }
 
-            return asistencia;
-        }
+            asistencia.Salida = DateTime.Now;
+            await context.SaveChangesAsync();
 
-        // PUT: api/Asistencias/5
-        [HttpPut("{id}")]
-        public async Task<IActionResult> PutAsistencia(int id, Asistencia asistencia)
-        {
-            if (id != asistencia.Id)
-            {
-                return BadRequest();
-            }
+            // Devolver tanto la asistencia como los detalles del miembro
+            var miembroDto = mapper.Map<MiembroDTO>(miembro);
+            var asistenciaDto = mapper.Map<AsistenciaDTO>(asistencia);
 
-            var asistenciaExistente = await _context.Asistencias.FindAsync(id);
-            if (asistenciaExistente == null)
-            {
-                return NotFound();
-            }
-
-            // Registrar salida
-            if (asistenciaExistente.Salida == null && asistencia.Salida.HasValue)
-            {
-                asistenciaExistente.Salida = DateTime.Now;
-            }
-
-            await _context.SaveChangesAsync();
-
-            return NoContent();
+            return Ok(new { Asistencia = asistenciaDto, Miembro = miembroDto });
         }
     }
 }
+

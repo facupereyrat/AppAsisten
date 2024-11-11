@@ -3,9 +3,13 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.11.35312.102
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AppAsisten.Server", "AppAsisten\AppAsisten.Server.csproj", "{4F4BE414-1F6B-4282-A6BA-87583807E133}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AppAsisten.Server", "AppAsisten\AppAsisten.Server.csproj", "{4F4BE414-1F6B-4282-A6BA-87583807E133}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AppAsisten.BD", "AppAsisten.BD\AppAsisten.BD.csproj", "{6500F580-0EFE-4F0B-9A60-FB72946266BB}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AppAsisten.BD", "AppAsisten.BD\AppAsisten.BD.csproj", "{6500F580-0EFE-4F0B-9A60-FB72946266BB}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AppAsisten.Shared", "AppAsisten.Shared\AppAsisten.Shared.csproj", "{65C7C6FB-81E4-4614-A223-4897C0D9B9EA}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AppAsist.Client", "AppAsist.Client\AppAsist.Client.csproj", "{BB3DA056-713F-4ACD-BF79-B360D95EFB65}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -21,6 +25,14 @@ Global
 		{6500F580-0EFE-4F0B-9A60-FB72946266BB}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{6500F580-0EFE-4F0B-9A60-FB72946266BB}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{6500F580-0EFE-4F0B-9A60-FB72946266BB}.Release|Any CPU.Build.0 = Release|Any CPU
+		{65C7C6FB-81E4-4614-A223-4897C0D9B9EA}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{65C7C6FB-81E4-4614-A223-4897C0D9B9EA}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{65C7C6FB-81E4-4614-A223-4897C0D9B9EA}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{65C7C6FB-81E4-4614-A223-4897C0D9B9EA}.Release|Any CPU.Build.0 = Release|Any CPU
+		{BB3DA056-713F-4ACD-BF79-B360D95EFB65}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{BB3DA056-713F-4ACD-BF79-B360D95EFB65}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{BB3DA056-713F-4ACD-BF79-B360D95EFB65}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{BB3DA056-713F-4ACD-BF79-B360D95EFB65}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

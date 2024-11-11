@@ -1,0 +1,45 @@
+﻿@page "/checkin"
+@inject AsistenciaService asistenciaService
+@inject NavigationManager Navigation
+
+<h3>Registro de Entrada</h3>
+
+<QRScannerComponent OnScanned="HandleQRCodeScan" />
+
+@if (isError)
+{
+    <p class="text-danger">@errorMessage</p>
+}
+
+@if (isSuccess)
+{
+    <p class="text-success">¡Entrada registrada correctamente!</p>
+}
+
+@code {
+    private bool isError = false;
+    private bool isSuccess = false;
+    private string errorMessage = string.Empty;
+
+    private async Task HandleQRCodeScan(string qrCode)
+    {
+        isError = false;
+        isSuccess = false;
+
+        // Llamamos al servicio para validar la entrada
+        var httpRespuesta = await asistenciaService.ValidarEntradaAsync(qrCode);
+        
+        // Si no hubo error en la respuesta
+        if (!httpRespuesta.Error)
+        {
+            isSuccess = true;
+            // Redirigir a otra página si es necesario
+            Navigation.NavigateTo("/actividad");
+        }
+        else
+        {
+            isError = true;
+            errorMessage = await httpRespuesta.ObtenerError();  // Obtener el mensaje de error detallado
+        }
+    }
+}

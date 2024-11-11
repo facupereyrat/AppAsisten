@@ -1,35 +1,48 @@
 using AppAsisten.BD.Data;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Configuration;
+using System.Text.Json.Serialization;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container.
+builder.Services.AddControllers().AddJsonOptions(
+    x => x.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.IgnoreCycles);
+
+builder.Services.AddControllersWithViews();
+builder.Services.AddRazorPages();
+
+// Registrar AutoMapper
+builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
+
+// Configurar la conexión de la base de datos
+builder.Services.AddDbContext<Context>(options =>
+    options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
+
+// Configurar servicios de controladores
 builder.Services.AddControllers();
 
-// Configuración de Swagger/OpenAPI para desarrollo
+// Agregar servicios de Swagger
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
-
-// Obtener la cadena de conexión desde el archivo de configuración (appsettings.json)
-var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
-
-// Configuración de DbContext para Entity Framework
-builder.Services.AddDbContext<Context>(options =>
-    options.UseSqlServer(connectionString));
 
 var app = builder.Build();
 
 // Configuración del pipeline HTTP
 if (app.Environment.IsDevelopment())
 {
-    app.UseSwagger();
-    app.UseSwaggerUI();
+    app.UseSwagger(); // Habilitar Swagger en el entorno de desarrollo
+    app.UseSwaggerUI(); // Habilitar la UI de Swagger
 }
 
-app.UseHttpsRedirection();
-app.UseAuthorization();
-app.MapControllers();
+app.UseHttpsRedirection(); // Redirigir a HTTPS
+app.UseBlazorFrameworkFiles();
+app.UseStaticFiles();
+app.UseRouting();
+app.MapRazorPages();
+
+app.UseAuthorization(); // Habilitar autorización
+
+app.MapControllers(); // Mapear los controladores
+app.MapFallbackToFile("index.html");
 
 // Ejecutar la aplicación
 app.Run();

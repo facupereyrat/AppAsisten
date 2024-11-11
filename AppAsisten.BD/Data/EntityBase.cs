@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace AppAsisten.BD.Data.Entity
+﻿namespace AppAsisten.BD.Data.Entity
 {
     public class EntityBase
     {

@@ -14,15 +14,19 @@ namespace AppAsisten.BD.Data
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            // Configuración para las relaciones y las claves foráneas
-            base.OnModelCreating(modelBuilder);
 
-            // Configuración de la relación entre Miembro y Asistencia
-            modelBuilder.Entity<Asistencia>()
-                .HasOne(a => a.Miembro)  // Cada Asistencia tiene un Miembro
-                .WithMany(m => m.Asistencias)  // Cada Miembro puede tener muchas Asistencias
-                .HasForeignKey(a => a.MiembroId);  // Clave foránea MiembroId
+            var cascadeFKs = modelBuilder.Model.G­etEntityTypes()
+                                          .SelectMany(t => t.GetForeignKeys())
+                                          .Where(fk => !fk.IsOwnership
+                                                       && fk.DeleteBehavior == DeleteBehavior.Casca­de);
+            foreach (var fk in cascadeFKs)
+            {
+                fk.DeleteBehavior = DeleteBehavior.Restr­ict;
+            }
+
+            base.OnModelCreating(modelBuilder);
         }
     }
 }
+
 
