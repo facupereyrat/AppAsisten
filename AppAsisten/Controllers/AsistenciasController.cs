@@ -42,12 +42,18 @@ namespace AppAsisten.Controllers
             context.Asistencias.Add(asistencia);
             await context.SaveChangesAsync();
 
-            // Devolver tanto la asistencia como los detalles del miembro
             var miembroDto = mapper.Map<MiembroDTO>(miembro);
-            var asistenciaDto = mapper.Map<AsistenciaDTO>(asistencia);
+            var asistenciaDto = mapper.Map<AsistenciaRespuestaDTO>(asistencia);
 
-            return Ok(new { Asistencia = asistenciaDto, Miembro = miembroDto });
+            var respuesta = new AsistenciaRespuestaDTO
+            {
+                Asistencia = asistenciaDto,
+                Miembro = miembroDto
+            };
+
+            return Ok(respuesta);  // Devolver la respuesta como AsistenciaRespuestaDTO
         }
+
 
         // Registrar Salida
         [HttpPost("salida")]
@@ -77,7 +83,7 @@ namespace AppAsisten.Controllers
 
             // Devolver tanto la asistencia como los detalles del miembro
             var miembroDto = mapper.Map<MiembroDTO>(miembro);
-            var asistenciaDto = mapper.Map<AsistenciaDTO>(asistencia);
+            var asistenciaDto = mapper.Map<AsistenciaRespuestaDTO>(asistencia);
 
             return Ok(new { Asistencia = asistenciaDto, Miembro = miembroDto });
         }

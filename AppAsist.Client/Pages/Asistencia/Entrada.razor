@@ -2,9 +2,7 @@
 @using AppAsist.Client.Servicios
 @inject IHttpServicio http
 @inject NavigationManager navigationManager
-
 <h3>Registrar Entrada</h3>
-
 <EditForm Model="entradaModel" OnValidSubmit="RegistrarEntrada">
     <DataAnnotationsValidator />
     <div class="form-group">
@@ -18,10 +16,8 @@
     <button class="btn btn-primary" type="submit">Registrar Entrada</button>
     <button class="btn btn-secondary" @onclick="Cancelar">Cancelar</button>
 </EditForm>
-
 @code {
     private EntradaModel entradaModel = new EntradaModel();
-
     private async Task RegistrarEntrada()
     {
         var httpRespuesta = await http.Post<string>("api/Asistencia/entrada", entradaModel.CodigoQR);
@@ -33,15 +29,13 @@
         else
         {
             // Si la entrada fue registrada correctamente, navega a la vista principal de asistencia
-            navigationManager.NavigateTo("/asistencia");
+            navigationManager.NavigateTo("api/asistencia");
         }
     }
-
     private void Cancelar()
     {
-        navigationManager.NavigateTo("/asistencia");
+        navigationManager.NavigateTo("api/sistencia");
     }
-
     public class EntradaModel
     {
         public string CodigoQR { get; set; }

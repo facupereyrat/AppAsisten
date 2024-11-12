@@ -16,7 +16,7 @@ namespace Concesionaria.Server.Mappers
                 .ForMember(dest => dest.EstaActivo, opt => opt.MapFrom(src => src.EstaActivo));
 
             // Mapeo de Asistencia a AsistenciaDTO
-            CreateMap<Asistencia, AsistenciaDTO>()
+            CreateMap<Asistencia, AsistenciaRespuestaDTO>()
                 .ForMember(dest => dest.MiembroId, opt => opt.MapFrom(src => src.MiembroId))
                 .ForMember(dest => dest.Entrada, opt => opt.MapFrom(src => src.Entrada ?? default))
                 .ForMember(dest => dest.Salida, opt => opt.MapFrom(src => src.Salida)); // Mapea la fecha de salida, si existe
@@ -27,7 +27,7 @@ namespace Concesionaria.Server.Mappers
                 .ForMember(dest => dest.CodigoQR, opt => opt.MapFrom(src => src.CodigoQR))
                 .ForMember(dest => dest.EstaActivo, opt => opt.MapFrom(src => src.EstaActivo));
 
-            CreateMap<AsistenciaDTO, Asistencia>()
+            CreateMap<AsistenciaRespuestaDTO, Asistencia>()
                 .ForMember(dest => dest.MiembroId, opt => opt.MapFrom(src => src.MiembroId))
                 .ForMember(dest => dest.Entrada, opt => opt.MapFrom(src => src.Entrada))
                 .ForMember(dest => dest.Salida, opt => opt.MapFrom(src => src.Salida));

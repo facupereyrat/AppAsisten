@@ -7,7 +7,7 @@
 
 <EditForm Model="nuevoMiembro" OnValidSubmit="RegistrarMiembro">
     <DataAnnotationsValidator />
-
+    
     <!-- Campo de Código QR -->
     <div class="form-group">
         <label>Código QR</label>
@@ -37,6 +37,7 @@
 
     <br />
     <button class="btn btn-primary" type="submit">Registrar</button>
+    <button class="btn btn-secondary" @onclick="Cancelar">Cancelar</button>
 </EditForm>
 
 @code {
@@ -46,8 +47,12 @@
     {
         var httpRespuesta = await http.Post<MiembroDTO>("api/Miembro/registrar-miembro", nuevoMiembro);
 
-        // Redirigir después de registrar el miembro
-        navigationManager.NavigateTo("/miembros"); // Ajusta la URL según sea necesario
+        navigationManager.NavigateTo("api/Miembro");
+    }
+
+    private void Cancelar()
+    {
+        navigationManager.NavigateTo("api/Miembro"); 
     }
 
     public class MiembroDTO

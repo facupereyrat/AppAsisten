@@ -6,10 +6,12 @@ using System.Threading.Tasks;
 
 namespace AppAsisten.Shared.DTO
 {
-    public class AsistenciaDTO
+    public class AsistenciaRespuestaDTO
     {
         public int MiembroId { get; set; }
         public DateTime Entrada { get; set; }
         public DateTime? Salida { get; set; }
+        public AsistenciaRespuestaDTO Asistencia { get; set; }
+        public MiembroDTO Miembro { get; set; }
     }
 }
