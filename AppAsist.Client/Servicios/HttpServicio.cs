@@ -1,71 +1,88 @@
-﻿using System.Net.Http;
-using System.Threading.Tasks;
+﻿using AppAsist.Client.Servicios;
+using Azure;
+using System.Text;
+using System.Text.Json;
 
-namespace AppAsist.Client.Servicios
+namespace Proyecto2024.Client.Servicios
 {
-    public class AsistenciaService
+    public class HttpServicio : IHttpServicio
     {
-        private readonly HttpClient httpClient;
+        private readonly HttpClient http;
 
-        public AsistenciaService(HttpClient httpClient)
+        public HttpServicio(HttpClient http)
         {
-            this.httpClient = httpClient;
+            this.http = http;
         }
 
-        // Método para validar la entrada del miembro
-        public async Task<HttpRespuesta<bool>> ValidarEntradaAsync(string qrCode)
+        public async Task<HttpRespuesta<T>> Get<T>(string url) //https://localhost:7268/api/TDocumentos
         {
-            try
+            var response = await http.GetAsync(url);
+
+            if (response.IsSuccessStatusCode)
             {
-                // Enviar solicitud GET al servidor para validar la entrada
-                var response = await httpClient.GetAsync($"api/asistencia/entrada/{qrCode}");
+                var respuesta = await DesSerializar<T>(response);
 
-                // Si la respuesta es exitosa, retornamos HttpRespuesta con 'true' y sin error
-                if (response.IsSuccessStatusCode)
-                {
-                    return new HttpRespuesta<bool>(true, false, response);
-                }
-
-                // Si la respuesta es un error, retornamos HttpRespuesta con 'false' y error
-                return new HttpRespuesta<bool>(false, true, response);
+                return new HttpRespuesta<T>(respuesta, false, response);
             }
-            catch (HttpRequestException)
+            else
             {
-                // Si hay problemas de conexión o error en la solicitud, retornamos un error genérico
-                var response = new HttpResponseMessage(System.Net.HttpStatusCode.ServiceUnavailable)
-                {
-                    ReasonPhrase = "No se pudo acceder al servidor. Verifica tu conexión a internet."
-                };
-                return new HttpRespuesta<bool>(false, true, response);
+                return new HttpRespuesta<T>(default, true, response);
             }
         }
 
-        // Método para validar la salida del miembro
-        public async Task<HttpRespuesta<bool>> ValidarSalidaAsync(string qrCode)
+        public async Task<HttpRespuesta<object>> Post<T>(string url, T entidad)
         {
-            try
-            {
-                // Enviar solicitud GET al servidor para validar la salida
-                var response = await httpClient.GetAsync($"api/asistencia/salida/{qrCode}");
+            var enviarJson = JsonSerializer.Serialize(entidad);
 
-                // Si la respuesta es exitosa, retornamos HttpRespuesta con 'true' y sin error
-                if (response.IsSuccessStatusCode)
-                {
-                    return new HttpRespuesta<bool>(true, false, response);
-                }
+            var enviarContent = new StringContent(enviarJson,
+                                Encoding.UTF8,
+                                "application/json");
 
-                // Si la respuesta es un error, retornamos HttpRespuesta con 'false' y error
-                return new HttpRespuesta<bool>(false, true, response);
-            }
-            catch (HttpRequestException)
+            var response = await http.PostAsync(url, enviarContent);
+            if (response.IsSuccessStatusCode)
             {
-                // Si hay problemas de conexión o error en la solicitud, retornamos un error genérico
-                var response = new HttpResponseMessage(System.Net.HttpStatusCode.ServiceUnavailable)
-                {
-                    ReasonPhrase = "No se pudo acceder al servidor. Verifica tu conexión a internet."
-                };
-                return new HttpRespuesta<bool>(false, true, response);
+                var respuesta = await DesSerializar<object>(response);
+                return new HttpRespuesta<object>(respuesta, false, response);
             }
+            else
+            {
+                return new HttpRespuesta<object>(default, true, response);
+            }
+        }
+
+        public async Task<HttpRespuesta<object>> Put<T>(string url, T entidad)
+        {
+            var enviarJson = JsonSerializer.Serialize(entidad);
+
+            var enviarContent = new StringContent(enviarJson,
+                                Encoding.UTF8,
+                                "application/json");
+
+            var response = await http.PutAsync(url, enviarContent);
+            if (response.IsSuccessStatusCode)
+            {
+                //var respuesta = await DesSerializar<object>(response);
+                return new HttpRespuesta<object>(null, false, response);
+            }
+            else
+            {
+                return new HttpRespuesta<object>(default, true, response);
+            }
+        }
+
+        public async Task<HttpRespuesta<object>> Delete(string url)
+        {
+            var respuesta = await http.DeleteAsync(url);
+            return new HttpRespuesta<object>(null,
+                                             !respuesta.IsSuccessStatusCode,
+                                             respuesta);
+        }
+
+        private async Task<T?> DesSerializar<T>(HttpResponseMessage response)
+        {
+            var respuestaStr = await response.Content.ReadAsStringAsync();
+            return JsonSerializer.Deserialize<T>(respuestaStr,
+                new JsonSerializerOptions() { PropertyNameCaseInsensitive = true });
         }
     }
 }

@@ -42,6 +42,7 @@ app.MapRazorPages();
 app.UseAuthorization(); // Habilitar autorización
 
 app.MapControllers(); // Mapear los controladores
+
 app.MapFallbackToFile("index.html");
 
 // Ejecutar la aplicación
