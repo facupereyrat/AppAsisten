@@ -16,8 +16,4 @@
     <ProjectReference Include="..\AppAsisten.Shared\AppAsisten.Shared.csproj" />
   </ItemGroup>
 
-  <ItemGroup>
-    <Folder Include="Pages\Miembro\" />
-  </ItemGroup>
-
 </Project>

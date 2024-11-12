@@ -36,7 +36,5 @@ namespace AppAsisten.Controllers
             var result = mapper.Map<MiembroDTO>(miembro);
             return Ok(result);
         }
-
-        // Otros métodos aquí...
     }
 }

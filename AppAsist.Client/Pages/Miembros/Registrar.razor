@@ -1,0 +1,59 @@
+﻿@page "/registrar-miembro"
+@using AppAsisten.Shared.DTO
+@inject IHttpServicio http
+@inject NavigationManager navigationManager
+
+<h3>Registrar Miembro</h3>
+
+<EditForm Model="nuevoMiembro" OnValidSubmit="RegistrarMiembro">
+    <DataAnnotationsValidator />
+
+    <!-- Campo de Código QR -->
+    <div class="form-group">
+        <label>Código QR</label>
+        <div>
+            <InputText class="form-control" @bind-Value="nuevoMiembro.CodigoQR" />
+            <ValidationMessage For="@(() => nuevoMiembro.CodigoQR)" />
+        </div>
+    </div>
+
+    <!-- Campo de Nombre -->
+    <div class="form-group">
+        <label>Nombre</label>
+        <div>
+            <InputText class="form-control" @bind-Value="nuevoMiembro.Nombre" />
+            <ValidationMessage For="@(() => nuevoMiembro.Nombre)" />
+        </div>
+    </div>
+
+    <!-- Campo de Edad -->
+    <div class="form-group">
+        <label>Edad</label>
+        <div>
+            <InputNumber class="form-control" @bind-Value="nuevoMiembro.Edad" />
+            <ValidationMessage For="@(() => nuevoMiembro.Edad)" />
+        </div>
+    </div>
+
+    <br />
+    <button class="btn btn-primary" type="submit">Registrar</button>
+</EditForm>
+
+@code {
+    private MiembroDTO nuevoMiembro = new MiembroDTO();
+
+    private async Task RegistrarMiembro()
+    {
+        var httpRespuesta = await http.Post<MiembroDTO>("api/Miembro/registrar-miembro", nuevoMiembro);
+
+        // Redirigir después de registrar el miembro
+        navigationManager.NavigateTo("/miembros"); // Ajusta la URL según sea necesario
+    }
+
+    public class MiembroDTO
+    {
+        public string CodigoQR { get; set; }
+        public string Nombre { get; set; }
+        public int Edad { get; set; }
+    }
+}
