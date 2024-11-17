@@ -41,13 +41,18 @@
 
     private async Task RegistrarEntrada()
     {
+        if (string.IsNullOrEmpty(codigoQR))
+        {
+            errorMessage = "Por favor, ingrese un código QR.";
+            return;
+        }
+
         try
         {
-            var respuesta = await HttpServicio.Post(codigoQR, "api/Asistencia/entrada");
+            var respuesta = await HttpServicio.Post<string>("api/Asistencia/entrada", codigoQR);
 
             if (respuesta.Error)
             {
-                // Obtener mensaje de error
                 errorMessage = await respuesta.ObtenerError();
                 asistencia = null;
             }
@@ -65,9 +70,15 @@
 
     private async Task RegistrarSalida()
     {
+        if (string.IsNullOrEmpty(codigoQR))
+        {
+            errorMessage = "Por favor, ingrese un código QR.";
+            return;
+        }
+
         try
         {
-            var respuesta = await HttpServicio.Post(codigoQR, "api/Asistencia/salida");
+            var respuesta = await HttpServicio.Post<string>("api/Asistencia/salida", codigoQR);
 
             if (respuesta.Error)
             {

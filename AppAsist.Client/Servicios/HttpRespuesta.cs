@@ -1,5 +1,6 @@
 ﻿using System.Net.Http;
 using System.Threading.Tasks;
+using System.Text.Json;
 
 namespace AppAsist.Client.Servicios
 {
@@ -13,10 +14,9 @@ namespace AppAsist.Client.Servicios
         {
             this.Respuesta = response;
             this.Error = error;
-            this.HttpResponseMessage = httpResponseMessage;
+            this.HttpResponseMessage = httpResponseMessage ?? throw new ArgumentNullException(nameof(httpResponseMessage));
         }
 
-        // Método para obtener el mensaje de error si lo hay
         public async Task<string> ObtenerError()
         {
             if (!Error)
@@ -49,6 +49,22 @@ namespace AppAsist.Client.Servicios
                     var content = await HttpResponseMessage.Content.ReadAsStringAsync();
                     return string.IsNullOrEmpty(content) ? "Error desconocido." : content;
             }
+        }
+
+        // Método para deserializar la respuesta HTTP en el tipo T
+        public async Task<T> Deserializar()
+        {
+            // Leemos el contenido de la respuesta
+            var content = await HttpResponseMessage.Content.ReadAsStringAsync();
+            // Usamos el JsonSerializer para deserializar el contenido en el tipo T
+            var resultado = JsonSerializer.Deserialize<T>(content, new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
+
+            if (resultado == null)
+            {
+                throw new InvalidOperationException("No se pudo deserializar la respuesta.");
+            }
+
+            return resultado;
         }
     }
 }
