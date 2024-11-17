@@ -1,0 +1,89 @@
+﻿@using System.Net.Http.Json
+@using AppAsisten.Shared.DTO
+@inject HttpClient Http
+@implements IAsyncDisposable
+
+<h3>Registro de Asistencia</h3>
+
+<div>
+    <label for="codigoQR">Código QR:</label>
+    <input type="text" id="codigoQR" @bind="codigoQR" class="form-control" />
+</div>
+
+<div>
+    <button class="btn btn-success" @onclick="RegistrarEntrada">Registrar Entrada</button>
+    <button class="btn btn-danger" @onclick="RegistrarSalida">Registrar Salida</button>
+</div>
+
+@if (respuesta != null)
+{
+    <div class="mt-3">
+        <p>@respuesta</p>
+    </div>
+}
+
+@code {
+    private string codigoQR;
+    private string respuesta;
+
+    private async Task RegistrarEntrada()
+    {
+        if (string.IsNullOrEmpty(codigoQR))
+        {
+            respuesta = "Por favor, ingresa un código QR.";
+            return;
+        }
+
+        try
+        {
+            var response = await Http.PostAsJsonAsync("/api/Asistencia/entrada", codigoQR);
+
+            if (response.IsSuccessStatusCode)
+            {
+                var data = await response.Content.ReadFromJsonAsync<AsistenciaRespuestaDTO>();
+                respuesta = $"Entrada registrada correctamente. Miembro: {data.Miembro.Nombre}, Hora de entrada: {data.Asistencia.Entrada}";
+            }
+            else
+            {
+                respuesta = $"Error: {await response.Content.ReadAsStringAsync()}";
+            }
+        }
+        catch (Exception ex)
+        {
+            respuesta = $"Hubo un error al registrar la entrada: {ex.Message}";
+        }
+    }
+
+    private async Task RegistrarSalida()
+    {
+        if (string.IsNullOrEmpty(codigoQR))
+        {
+            respuesta = "Por favor, ingresa un código QR.";
+            return;
+        }
+
+        try
+        {
+            var response = await Http.PostAsJsonAsync("/api/Asistencia/salida", codigoQR);
+
+            if (response.IsSuccessStatusCode)
+            {
+                var data = await response.Content.ReadFromJsonAsync<AsistenciaRespuestaDTO>();
+                respuesta = $"Salida registrada correctamente. Miembro: {data.Miembro.Nombre}, Hora de salida: {data.Asistencia.Salida}";
+            }
+            else
+            {
+                respuesta = $"Error: {await response.Content.ReadAsStringAsync()}";
+            }
+        }
+        catch (Exception ex)
+        {
+            respuesta = $"Hubo un error al registrar la salida: {ex.Message}";
+        }
+    }
+
+    public async ValueTask DisposeAsync()
+    {
+        // Si hay algo que liberar, como suscripciones o recursos, puedes hacerlo aquí.
+    }
+}

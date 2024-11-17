@@ -5,11 +5,10 @@ using Microsoft.AspNetCore.Components.WebAssembly.Hosting;
 using Proyecto2024.Client.Servicios;
 
 var builder = WebAssemblyHostBuilder.CreateDefault(args);
+
+// Configurar el componente raíz
 builder.RootComponents.Add<App>("#app");
 builder.RootComponents.Add<HeadOutlet>("head::after");
-
-// Agregar el componente raíz de la aplicación
-builder.RootComponents.Add<App>("#app");
 
 // Registrar el HttpClient
 builder.Services.AddScoped(sp => new HttpClient { BaseAddress = new Uri(builder.HostEnvironment.BaseAddress) });
