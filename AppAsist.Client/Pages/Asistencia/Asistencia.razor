@@ -1,89 +1,88 @@
-﻿@using System.Net.Http.Json
+﻿@page "/api/asistencia"
 @using AppAsisten.Shared.DTO
-@inject HttpClient Http
-@implements IAsyncDisposable
+@inject IHttpServicio HttpServicio
 
-<h3>Registro de Asistencia</h3>
+<h3>Registrar Asistencia</h3>
 
 <div>
     <label for="codigoQR">Código QR:</label>
-    <input type="text" id="codigoQR" @bind="codigoQR" class="form-control" />
+    <input type="text" id="codigoQR" @bind="codigoQR" />
+
+    <button @onclick="RegistrarEntrada">Registrar Entrada</button>
+    <button @onclick="RegistrarSalida">Registrar Salida</button>
 </div>
 
-<div>
-    <button class="btn btn-success" @onclick="RegistrarEntrada">Registrar Entrada</button>
-    <button class="btn btn-danger" @onclick="RegistrarSalida">Registrar Salida</button>
-</div>
-
-@if (respuesta != null)
+@if (asistencia != null)
 {
-    <div class="mt-3">
-        <p>@respuesta</p>
+    <div>
+        <h4>Asistencia Registrada</h4>
+        <p><strong>Miembro:</strong> @asistencia.Miembro.Nombre</p>
+        <p><strong>Entrada:</strong> @asistencia.Asistencia.Entrada</p>
+        @if (asistencia.Asistencia.Salida.HasValue)
+        {
+            <p><strong>Salida:</strong> @asistencia.Asistencia.Salida</p>
+        }
+        else
+        {
+            <p><strong>Salida:</strong> Pendiente</p>
+        }
     </div>
+}
+
+@if (!string.IsNullOrEmpty(errorMessage))
+{
+    <p class="text-danger">@errorMessage</p>
 }
 
 @code {
     private string codigoQR;
-    private string respuesta;
+    private AsistenciaRespuestaDTO asistencia;
+    private string errorMessage;
 
     private async Task RegistrarEntrada()
     {
-        if (string.IsNullOrEmpty(codigoQR))
-        {
-            respuesta = "Por favor, ingresa un código QR.";
-            return;
-        }
-
         try
         {
-            var response = await Http.PostAsJsonAsync("/api/Asistencia/entrada", codigoQR);
+            var respuesta = await HttpServicio.Post(codigoQR, "api/Asistencia/entrada");
 
-            if (response.IsSuccessStatusCode)
+            if (respuesta.Error)
             {
-                var data = await response.Content.ReadFromJsonAsync<AsistenciaRespuestaDTO>();
-                respuesta = $"Entrada registrada correctamente. Miembro: {data.Miembro.Nombre}, Hora de entrada: {data.Asistencia.Entrada}";
+                // Obtener mensaje de error
+                errorMessage = await respuesta.ObtenerError();
+                asistencia = null;
             }
             else
             {
-                respuesta = $"Error: {await response.Content.ReadAsStringAsync()}";
+                errorMessage = string.Empty;
             }
         }
         catch (Exception ex)
         {
-            respuesta = $"Hubo un error al registrar la entrada: {ex.Message}";
+            asistencia = null;
+            errorMessage = $"Error: {ex.Message}";
         }
     }
 
     private async Task RegistrarSalida()
     {
-        if (string.IsNullOrEmpty(codigoQR))
-        {
-            respuesta = "Por favor, ingresa un código QR.";
-            return;
-        }
-
         try
         {
-            var response = await Http.PostAsJsonAsync("/api/Asistencia/salida", codigoQR);
+            var respuesta = await HttpServicio.Post(codigoQR, "api/Asistencia/salida");
 
-            if (response.IsSuccessStatusCode)
+            if (respuesta.Error)
             {
-                var data = await response.Content.ReadFromJsonAsync<AsistenciaRespuestaDTO>();
-                respuesta = $"Salida registrada correctamente. Miembro: {data.Miembro.Nombre}, Hora de salida: {data.Asistencia.Salida}";
+                errorMessage = await respuesta.ObtenerError();
+                asistencia = null;
             }
             else
             {
-                respuesta = $"Error: {await response.Content.ReadAsStringAsync()}";
+                errorMessage = string.Empty;
             }
         }
         catch (Exception ex)
         {
-            respuesta = $"Hubo un error al registrar la salida: {ex.Message}";
+            asistencia = null;
+            errorMessage = $"Error: {ex.Message}";
         }
-    }
-
-    public async ValueTask DisposeAsync()
-    {
-        // Si hay algo que liberar, como suscripciones o recursos, puedes hacerlo aquí.
     }
 }

@@ -35,13 +35,13 @@ namespace Proyecto2024.Client.Servicios
             var enviarJson = JsonSerializer.Serialize(entidad);
 
             var enviarContent = new StringContent(enviarJson,
-                                Encoding.UTF8,
-                                "application/json");
+                                    Encoding.UTF8,
+                                    "application/json");
 
             var response = await http.PostAsync(url, enviarContent);
             if (response.IsSuccessStatusCode)
             {
-                var respuesta = await DesSerializar<object>(response);
+                var respuesta = await DesSerializar<object>(response); 
                 return new HttpRespuesta<object>(respuesta, false, response);
             }
             else
@@ -49,6 +49,7 @@ namespace Proyecto2024.Client.Servicios
                 return new HttpRespuesta<object>(default, true, response);
             }
         }
+
 
         public async Task<HttpRespuesta<object>> Put<T>(string url, T entidad)
         {
