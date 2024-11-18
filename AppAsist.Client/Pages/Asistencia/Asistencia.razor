@@ -34,7 +34,6 @@
     {
         if (string.IsNullOrEmpty(codigoQR))
         {
-            // Agregar validación simple
             return;
         }
 
@@ -47,7 +46,6 @@
         else
         {
             asistenciaRespuesta = null;
-            // Mostrar mensaje de error
             var errorMessage = await response.Content.ReadAsStringAsync();
             Console.WriteLine($"Error: {errorMessage}");
         }
@@ -58,7 +56,6 @@
     {
         if (string.IsNullOrEmpty(codigoQR))
         {
-            // Agregar validación simple
             return;
         }
 
@@ -71,7 +68,6 @@
         else
         {
             asistenciaRespuesta = null;
-            // Mostrar mensaje de error
             var errorMessage = await response.Content.ReadAsStringAsync();
             Console.WriteLine($"Error: {errorMessage}");
         }
