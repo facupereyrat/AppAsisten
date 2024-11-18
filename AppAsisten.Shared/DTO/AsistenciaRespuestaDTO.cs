@@ -11,7 +11,7 @@ namespace AppAsisten.Shared.DTO
         public int MiembroId { get; set; }
         public DateTime Entrada { get; set; }
         public DateTime? Salida { get; set; }
-        public AsistenciaRespuestaDTO Asistencia { get; set; }
-        public MiembroDTO Miembro { get; set; }
+        public AsistenciaRespuestaDTO? Asistencia { get; set; }
+        public MiembroDTO? Miembro { get; set; }
     }
 }

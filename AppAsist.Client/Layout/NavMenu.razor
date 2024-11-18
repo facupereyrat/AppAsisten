@@ -1,6 +1,6 @@
 ﻿<div class="top-row ps-3 navbar navbar-dark">
     <div class="container-fluid">
-        <a class="navbar-brand" href="/">Club Deportivo</a>  <!-- Asegúrate de que el enlace al home tenga '/' -->
+        <a class="navbar-brand" href="/">Club Deportivo</a> 
         <button title="Navigation menu" class="navbar-toggler" @onclick="ToggleNavMenu">
             <span class="navbar-toggler-icon"></span>
         </button>
@@ -9,32 +9,26 @@
 
 <div class="@NavMenuCssClass nav-scrollable" @onclick="ToggleNavMenu">
     <nav class="flex-column">
-        <!-- Home Link -->
         <div class="nav-item px-3">
             <NavLink class="nav-link" href="/" Match="NavLinkMatch.All">
                 <span class="bi bi-house-door-fill" aria-hidden="true"></span> Home
             </NavLink>
         </div>
 
-        <!-- Registrar Miembro Link -->
         <div class="nav-item px-3">
-            <NavLink class="nav-link" href="/api/Miembro">
-                <!-- Asegúrate de que el enlace empiece con '/' -->
+            <NavLink class="nav-link" href="api/miembro">
                 <span class="bi bi-person-add" aria-hidden="true"></span> Registrar Miembro
             </NavLink>
         </div>
 
-        <!-- Asistencia Link (Nueva sección de Asistencia) -->
         <div class="nav-item px-3">
-            <NavLink class="nav-link" href="/api/asistencia">
-                <!-- Asegúrate de que el enlace empiece con '/' -->
+            <NavLink class="nav-link" href="api/asistencia">
                 <span class="bi bi-clipboard-check" aria-hidden="true"></span> Asistencia
             </NavLink>
         </div>
 
-        <!-- Swagger Link -->
         <div class="nav-item px-3">
-            <NavLink class="nav-link" href="/Swagger" target="_blank">
+            <NavLink class="nav-link" href="/swagger" target="_blank">
                 <span class="bi bi-file-earmark-code" aria-hidden="true"></span> Swagger
             </NavLink>
         </div>
