@@ -7,7 +7,7 @@
 
 <EditForm Model="nuevoMiembro" OnValidSubmit="RegistrarMiembro">
     <DataAnnotationsValidator />
-    
+
     <!-- Campo de Código QR -->
     <div class="form-group">
         <label>Código QR</label>
@@ -40,19 +40,53 @@
     <button class="btn btn-secondary" @onclick="Cancelar">Cancelar</button>
 </EditForm>
 
+@if (!string.IsNullOrEmpty(resultado))
+{
+    <div class="alert @alertClass mt-3">
+        @resultado
+    </div>
+}
+
 @code {
     private MiembroDTO nuevoMiembro = new MiembroDTO();
+    private string resultado;  // Mensaje para mostrar el resultado de la operación
+    private string alertClass;  // Clase para la alerta (exito o error)
 
     private async Task RegistrarMiembro()
     {
-        var httpRespuesta = await http.Post<MiembroDTO>("api/Miembro/registrar-miembro", nuevoMiembro);
+        try
+        {
+            // Enviar los datos al backend
+            var httpRespuesta = await http.Post<MiembroDTO>("api/Miembro/registrar-miembro", nuevoMiembro);
 
-        navigationManager.NavigateTo("api/Miembro");
+            if (httpRespuesta != null)
+            {
+                // Si la respuesta es exitosa
+                resultado = "Miembro registrado exitosamente!";
+                alertClass = "alert-success";
+
+                // Redirigir a otra página después de mostrar el mensaje (si es necesario)
+                navigationManager.NavigateTo("api/Miembro");
+            }
+            else
+            {
+                // Si no se pudo registrar
+                resultado = "Hubo un error al registrar el miembro.";
+                alertClass = "alert-danger";
+            }
+        }
+        catch (Exception ex)
+        {
+            // En caso de error de red o fallo en la API
+            resultado = $"Error al registrar el miembro: {ex.Message}";
+            alertClass = "alert-danger";
+        }
     }
 
     private void Cancelar()
     {
-        navigationManager.NavigateTo("api/Miembro"); 
+        // Volver a la página principal o a la vista de miembros
+        navigationManager.NavigateTo("api/Miembro");
     }
 
     public class MiembroDTO

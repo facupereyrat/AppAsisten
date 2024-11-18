@@ -1,6 +1,7 @@
 ﻿using System.Net.Http;
 using System.Threading.Tasks;
 using System.Text.Json;
+using System;
 
 namespace AppAsist.Client.Servicios
 {
@@ -10,6 +11,7 @@ namespace AppAsist.Client.Servicios
         public bool Error { get; set; }
         public HttpResponseMessage HttpResponseMessage { get; set; }
 
+        // Constructor principal para respuestas con error y HttpResponseMessage
         public HttpRespuesta(T? response, bool error, HttpResponseMessage httpResponseMessage)
         {
             this.Respuesta = response;
@@ -17,6 +19,15 @@ namespace AppAsist.Client.Servicios
             this.HttpResponseMessage = httpResponseMessage ?? throw new ArgumentNullException(nameof(httpResponseMessage));
         }
 
+        // Constructor para cuando no hay error (ejemplo: cuando la solicitud es exitosa)
+        public HttpRespuesta(T? response)
+        {
+            this.Respuesta = response;
+            this.Error = false;
+            this.HttpResponseMessage = null!;
+        }
+
+        // Método para obtener un mensaje de error basado en el código de estado HTTP
         public async Task<string> ObtenerError()
         {
             if (!Error)
@@ -54,17 +65,27 @@ namespace AppAsist.Client.Servicios
         // Método para deserializar la respuesta HTTP en el tipo T
         public async Task<T> Deserializar()
         {
-            // Leemos el contenido de la respuesta
-            var content = await HttpResponseMessage.Content.ReadAsStringAsync();
-            // Usamos el JsonSerializer para deserializar el contenido en el tipo T
-            var resultado = JsonSerializer.Deserialize<T>(content, new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
-
-            if (resultado == null)
+            if (HttpResponseMessage == null)
             {
-                throw new InvalidOperationException("No se pudo deserializar la respuesta.");
+                throw new InvalidOperationException("HttpResponseMessage no puede ser nulo para deserializar.");
             }
 
-            return resultado;
+            try
+            {
+                var content = await HttpResponseMessage.Content.ReadAsStringAsync();
+                var resultado = JsonSerializer.Deserialize<T>(content, new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
+
+                if (resultado == null)
+                {
+                    throw new InvalidOperationException("No se pudo deserializar la respuesta.");
+                }
+
+                return resultado;
+            }
+            catch (JsonException ex)
+            {
+                throw new InvalidOperationException("Hubo un problema al deserializar la respuesta JSON.", ex);
+            }
         }
     }
 }

@@ -1,6 +1,6 @@
 ﻿<div class="top-row ps-3 navbar navbar-dark">
     <div class="container-fluid">
-        <a class="navbar-brand" href="">Club Deportivo</a>
+        <a class="navbar-brand" href="/">Club Deportivo</a>  <!-- Asegúrate de que el enlace al home tenga '/' -->
         <button title="Navigation menu" class="navbar-toggler" @onclick="ToggleNavMenu">
             <span class="navbar-toggler-icon"></span>
         </button>
@@ -18,14 +18,16 @@
 
         <!-- Registrar Miembro Link -->
         <div class="nav-item px-3">
-            <NavLink class="nav-link" href="api/Miembro">
+            <NavLink class="nav-link" href="/api/Miembro">
+                <!-- Asegúrate de que el enlace empiece con '/' -->
                 <span class="bi bi-person-add" aria-hidden="true"></span> Registrar Miembro
             </NavLink>
         </div>
 
         <!-- Asistencia Link (Nueva sección de Asistencia) -->
         <div class="nav-item px-3">
-            <NavLink class="nav-link" href="api/asistencia">
+            <NavLink class="nav-link" href="/api/asistencia">
+                <!-- Asegúrate de que el enlace empiece con '/' -->
                 <span class="bi bi-clipboard-check" aria-hidden="true"></span> Asistencia
             </NavLink>
         </div>
