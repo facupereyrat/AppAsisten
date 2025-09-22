@@ -4,6 +4,11 @@ using System.Text.Json.Serialization;
 
 var builder = WebApplication.CreateBuilder(args);
 
+builder.Services.AddOutputCache(options =>
+{
+    options.DefaultExpirationTimeSpan = TimeSpan.FromMinutes(60);
+});
+
 builder.Services.AddControllers().AddJsonOptions(
     x => x.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.IgnoreCycles);
 
@@ -40,6 +45,8 @@ app.UseRouting();
 app.MapRazorPages();
 
 app.UseAuthorization(); // Habilitar autorización
+
+app.UseOutputCache();
 
 app.MapControllers(); // Mapear los controladores
 
