@@ -4,6 +4,7 @@ using AppAsisten.Shared.DTO;
 using AutoMapper;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.AspNetCore.OutputCaching;
 
 namespace AppAsisten.Controllers
 {
@@ -18,6 +19,20 @@ namespace AppAsisten.Controllers
         {
             this.context = context;
             this.mapper = mapper;
+        }
+
+
+
+        [HttpGet]
+        [OutputCache()]
+        public async Task<ActionResult<IEnumerable<Miembro>>> GetMiembros()
+        {
+            var miembros = await context.Miembros.ToListAsync();
+            if (miembros == null || !miembros.Any())
+            {
+                return NotFound("No se encontraron miembros registrados.");
+            }
+            return Ok(miembros);
         }
 
         // Endpoint para crear un nuevo miembro
