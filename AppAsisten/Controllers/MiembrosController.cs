@@ -14,6 +14,8 @@ namespace AppAsisten.Controllers
     {
         private readonly Context context;
         private readonly IMapper mapper;
+        private readonly IOutputCacheStore outputCacheStore;
+        private const string cacheKey = "TDocumentos";
 
         public MiembroController(Context context, IMapper mapper)
         {
@@ -43,6 +45,8 @@ namespace AppAsisten.Controllers
             {
                 return BadRequest("Ya existe un miembro con este código QR.");
             }
+
+            await outputCacheStore.EvictByTagAsync(cacheKey, default);
 
             var miembro = mapper.Map<Miembro>(miembroDTO);
             context.Miembros.Add(miembro);
