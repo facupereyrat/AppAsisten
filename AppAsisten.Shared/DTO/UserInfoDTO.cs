@@ -5,7 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace AppAsist.Shared.DTO
+namespace AppAsisten.Shared.DTO
 {
     public class UserInfoDTO
     {

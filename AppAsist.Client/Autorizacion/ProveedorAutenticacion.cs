@@ -27,7 +27,7 @@ namespace AppAsist.Client.Autorizacion
                 },
                 authenticationType: "ok"
                 );
-            return await Task.FromResult(new AuthenticationState(new ClaimsPrincipal(usuarioPepe)));
+            return await Task.FromResult(new AuthenticationState(new ClaimsPrincipal(anonimo)));
         }
     }
 }

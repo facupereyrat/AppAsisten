@@ -1,4 +1,4 @@
-﻿using AppAsist.Shared.DTO;
+﻿using AppAsisten.Shared.DTO;
 
 namespace AppAsist.Client.Autorizacion
 {

@@ -4,7 +4,7 @@ using AppAsist.Client.Servicios;
 using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.AspNetCore.Components.Web;
 using Microsoft.AspNetCore.Components.WebAssembly.Hosting;
-using AppAsist.Client.Servicios;
+using Proyecto2024.Client.Servicios;
 
 var builder = WebAssemblyHostBuilder.CreateDefault(args);
 

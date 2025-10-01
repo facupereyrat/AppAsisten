@@ -1,16 +1,13 @@
-﻿@page "/api/Miembro"
+﻿@page "/login"
 @using AppAsist.Client.Autorizacion
 @using AppAsisten.Shared.DTO
-@inject IHttpServicio http
-@inject NavigationManager navigationManager
 @inject IHttpServicio http
 @inject NavigationManager navigationManager
 @inject IJSRuntime js
 @inject ILoginService loginService
 
-<h3>Registrar</h3>
-
-<EditForm Model="userInfo" OnValidSubmit="CrearUsuario">
+<h3>Login</h3>
+<EditForm Model="userInfo" OnValidSubmit="Loguear">
     <DataAnnotationsValidator />
 
     <div class="mb-3">
@@ -23,15 +20,15 @@
         <InputText id="password" type="password" class="form-control" @bind-Value="userInfo.Password" />
         <ValidationMessage For="@(() => userInfo.Password)" />
     </div>
-    <button type="submit" class="btn btn-primary">Registrar</button>
+    <button type="submit" class="btn btn-primary">Loguear</button>
 </EditForm>
 
 @code {
     private UserInfoDTO userInfo = new UserInfoDTO();
 
-    private async Task CrearUsuario()
+    private async Task Loguear()
     {
-        var httpRespuesta = await http.Post<UserInfoDTO, UserTokenDTO>("usuarios/registrar", userInfo);
+        var httpRespuesta = await http.Post<UserInfoDTO, UserTokenDTO>("usuarios/login", userInfo);
         if (httpRespuesta.Error)
         {
             var msg = await httpRespuesta.ObtenerError();

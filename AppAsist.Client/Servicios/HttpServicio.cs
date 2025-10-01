@@ -3,7 +3,7 @@ using Azure;
 using System.Text;
 using System.Text.Json;
 
-namespace AppAsist.Client.Servicios
+namespace Proyecto2024.Client.Servicios
 {
     public class HttpServicio : IHttpServicio
     {
@@ -84,6 +84,11 @@ namespace AppAsist.Client.Servicios
             var respuestaStr = await response.Content.ReadAsStringAsync();
             return JsonSerializer.Deserialize<T>(respuestaStr,
                 new JsonSerializerOptions() { PropertyNameCaseInsensitive = true });
+        }
+
+        public Task<HttpRespuesta<TResp>> Post<T, TResp>(string url, T entidad)
+        {
+            throw new NotImplementedException();
         }
     }
 }
