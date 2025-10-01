@@ -3,7 +3,7 @@ using Azure;
 using System.Text;
 using System.Text.Json;
 
-namespace Proyecto2024.Client.Servicios
+namespace AppAsist.Client.Servicios
 {
     public class HttpServicio : IHttpServicio
     {

@@ -2,7 +2,7 @@
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Proyecto2024.Shared.DTO;
+using AppAsist.Shared.DTO;
 using System.Security.Claims;
 using System.Text;
 using Microsoft.IdentityModel.Tokens;
