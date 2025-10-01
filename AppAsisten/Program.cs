@@ -1,4 +1,5 @@
 using AppAsisten.BD.Data;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using System.Text.Json.Serialization;
 
@@ -22,6 +23,10 @@ builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
 builder.Services.AddDbContext<Context>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 
+builder.Services.AddIdentity<IdentityUser, IdentityRole>()
+                .AddEntityFrameworkStores<Context>()
+                .AddDefaultTokenProviders();
+
 // Configurar servicios de controladores
 builder.Services.AddControllers();
 
@@ -44,6 +49,7 @@ app.UseStaticFiles();
 app.UseRouting();
 app.MapRazorPages();
 
+app.UseAuthentication();
 app.UseAuthorization(); // Habilitar autorización
 
 app.UseOutputCache();
