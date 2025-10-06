@@ -2,7 +2,7 @@
 using AppAsisten.Shared.DTO;
 using AutoMapper;
 
-namespace Concesionaria.Server.Mappers
+namespace AppAsisten.Server.Mapper
 {
     public class AutoMapperProfiles : Profile
     {

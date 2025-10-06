@@ -4,7 +4,6 @@ using AppAsist.Client.Servicios;
 using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.AspNetCore.Components.Web;
 using Microsoft.AspNetCore.Components.WebAssembly.Hosting;
-using Proyecto2024.Client.Servicios;
 
 var builder = WebAssemblyHostBuilder.CreateDefault(args);
 
@@ -18,6 +17,10 @@ builder.Services.AddAuthorizationCore();
 
 // Registrar IHttpServicio con su implementación HttpServicio
 builder.Services.AddScoped<IHttpServicio, HttpServicio>();
-builder.Services.AddScoped<AuthenticationStateProvider, ProveedorAutenticacion>();
+builder.Services.AddScoped<ProveedorAutenticacionJWT>();
+builder.Services.AddScoped<AuthenticationStateProvider, ProveedorAutenticacionJWT>(proveedor =>
+    proveedor.GetRequiredService<ProveedorAutenticacionJWT>());
+builder.Services.AddScoped<ILoginService, ProveedorAutenticacionJWT>(proveedor =>
+    proveedor.GetRequiredService<ProveedorAutenticacionJWT>());
 // Construir y ejecutar la aplicación
 await builder.Build().RunAsync();

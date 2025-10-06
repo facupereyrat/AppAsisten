@@ -1,9 +1,8 @@
-﻿using AppAsist.Client.Servicios;
-using Azure;
+﻿using Azure;
 using System.Text;
 using System.Text.Json;
 
-namespace Proyecto2024.Client.Servicios
+namespace AppAsist.Client.Servicios
 {
     public class HttpServicio : IHttpServicio
     {
@@ -86,9 +85,33 @@ namespace Proyecto2024.Client.Servicios
                 new JsonSerializerOptions() { PropertyNameCaseInsensitive = true });
         }
 
-        public Task<HttpRespuesta<TResp>> Post<T, TResp>(string url, T entidad)
+        public async Task<HttpRespuesta<TResp>> Post<T, TResp>(string url, T entidad)
         {
-            throw new NotImplementedException();
+            // 1. Serializar el objeto de entrada a JSON.
+            var enviarJson = JsonSerializer.Serialize(entidad);
+
+            // 2. Crear el contenido HTTP con el encabezado correcto.
+            var enviarContent = new StringContent(enviarJson,
+                                                  Encoding.UTF8,
+                                                  "application/json");
+
+            // 3. Enviar la solicitud POST.
+            var response = await http.PostAsync(url, enviarContent);
+
+            // 4. Procesar la respuesta.
+            if (response.IsSuccessStatusCode)
+            {
+                // Deserializar la respuesta al tipo TResp esperado.
+                var respuesta = await DesSerializar<TResp>(response);
+
+                // Retornar la respuesta exitosa.
+                return new HttpRespuesta<TResp>(respuesta, false, response);
+            }
+            else
+            {
+                // Retornar la respuesta fallida.
+                return new HttpRespuesta<TResp>(default, true, response);
+            }
         }
     }
 }
