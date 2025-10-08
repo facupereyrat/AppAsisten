@@ -1,10 +1,10 @@
-﻿using Microsoft.AspNetCore.Identity;
+﻿using AppAsisten.Shared.DTO;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
-using System.Security.Claims;
-using System.Text;
 using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
-using AppAsisten.Shared.DTO;
+using System.Security.Claims;
+using System.Text;
 
 namespace AppAsisten.Server.Controllers
 {

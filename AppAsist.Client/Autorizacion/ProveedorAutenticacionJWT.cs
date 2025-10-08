@@ -1,13 +1,10 @@
 ﻿using AppAsist.Client.Servicios;
+using AppAsisten.Shared.DTO;
 using Microsoft.AspNetCore.Components.Authorization;
-using Microsoft.IdentityModel.Tokens;
 using Microsoft.JSInterop;
-using AppAsist.Client.Servicios;
 using System.IdentityModel.Tokens.Jwt;
-using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Security.Claims;
-using AppAsisten.Shared.DTO;
 
 namespace AppAsist.Client.Autorizacion
 {
