@@ -68,9 +68,9 @@ namespace AppAsisten.Controllers
             }
 
             var asistencia = await context.Asistencias
-                .Where(a => a.Miembro.CodigoQR == codigoQR)
+                .Where(a => a.Miembro.CodigoQR == codigoQR && a.Salida == null)
                 .OrderByDescending(a => a.Entrada)   
-                .LastOrDefaultAsync();
+                .FirstOrDefaultAsync();
 
 
             if (asistencia == null)
@@ -81,7 +81,6 @@ namespace AppAsisten.Controllers
             asistencia.Salida = DateTime.Now;
             await context.SaveChangesAsync();
 
-            // Devolver tanto la asistencia como los detalles del miembro
             var miembroDto = mapper.Map<MiembroDTO>(miembro);
             var asistenciaDto = mapper.Map<AsistenciaRespuestaDTO>(asistencia);
 
