@@ -57,7 +57,6 @@ namespace AppAsisten.Server.Controllers
             {
                 return BadRequest("Login incorrecto");
             }
-
         }
 
         private async Task<UserTokenDTO> ConstruirToken(UserInfoDTO userInfoDTO)
@@ -69,26 +68,31 @@ namespace AppAsisten.Server.Controllers
                 new Claim("otro", "cualquier cosa")
             };
 
-            var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(configuration["jwtkey"]!));
+            // Leer clave desde configuración
+            var secretKey = configuration["JwtKey"];
+            if (string.IsNullOrEmpty(secretKey) || secretKey.Length < 32)
+            {
+                throw new InvalidOperationException("La clave JWT debe estar configurada y tener al menos 32 caracteres.");
+            }
+
+            var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(secretKey));
             var credenciales = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
 
             var expiracion = DateTime.UtcNow.AddMonths(1);
 
-            var token = new JwtSecurityToken
-                            (
-                                issuer: null,
-                                audience: null,
-                                claims: claims,
-                                expires: expiracion,
-                                signingCredentials: credenciales
-                            );
+            var token = new JwtSecurityToken(
+                issuer: null,
+                audience: null,
+                claims: claims,
+                expires: expiracion,
+                signingCredentials: credenciales
+            );
 
             return new UserTokenDTO()
             {
                 Token = new JwtSecurityTokenHandler().WriteToken(token),
                 Expiracion = expiracion
             };
-
         }
     }
 }
