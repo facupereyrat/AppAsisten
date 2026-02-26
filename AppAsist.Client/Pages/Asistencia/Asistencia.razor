@@ -1,5 +1,7 @@
 ﻿@page "/asistencia"
+@page "/asistencia/{codigo}"  // ← NUEVA RUTA CON PARÁMETRO
 @inject HttpClient Http
+@inject NavigationManager Navigation  // ← AGREGÁ ESTO
 @using AppAsisten.Shared.DTO
 @using System.Net.Http.Json
 
@@ -27,15 +29,12 @@
         <h5>
             @(asistenciaRespuesta.EsEntrada
                     ? "Entrada registrada correctamente" 
-                                    : "Salida registrada correctamente")
+                                            : "Salida registrada correctamente")
         </h5>
 
         <p><strong>Miembro:</strong> @asistenciaRespuesta.Miembro?.Nombre</p>
         <p><strong>Entrada:</strong> @asistenciaRespuesta.Entrada</p>
-        <p>
-            <strong>Salida:</strong>
-            @(asistenciaRespuesta.Salida?.ToString() ?? "No registrada aún")
-        </p>
+        <p><strong>Salida:</strong> @(asistenciaRespuesta.Salida?.ToString() ?? "No registrada aún")</p>
     </div>
 }
 
@@ -43,6 +42,21 @@
     private string codigoQR;
     private AsistenciaRespuestaDTO asistenciaRespuesta;
     private string mensajeError;
+
+    // 👇 NUEVO: Parámetro que viene de la URL
+    [Parameter]
+    public string? codigo { get; set; }
+
+    // 👇 NUEVO: Cuando la página se carga
+    protected override void OnInitialized()
+    {
+        if (!string.IsNullOrEmpty(codigo))
+        {
+            codigoQR = codigo;
+            // Llamamos a Registrar pero necesitamos que sea async
+            _ = Task.Run(async () => await Registrar());
+        }
+    }
 
     private async Task Registrar()
     {
