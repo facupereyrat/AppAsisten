@@ -41,19 +41,20 @@ namespace AppAsisten.Controllers
         [HttpPost("registrar-miembro")]
         public async Task<IActionResult> RegistrarMiembro([FromBody] MiembroDTO miembroDTO)
         {
-            if (await context.Miembros.AnyAsync(m => m.CodigoQR == miembroDTO.CodigoQR))
-            {
-                return BadRequest("Ya existe un miembro con este código QR.");
-            }
-
             await outputCacheStore.EvictByTagAsync(cacheKey, default);
 
             var miembro = mapper.Map<Miembro>(miembroDTO);
+
+            // Generar automáticamente un código numérico de 6 dígitos
+            var random = new Random();
+            miembro.CodigoQR = random.Next(100000, 999999).ToString();
+
             context.Miembros.Add(miembro);
             await context.SaveChangesAsync();
 
             var result = mapper.Map<MiembroDTO>(miembro);
             return Ok(result);
         }
+
     }
 }

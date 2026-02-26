@@ -56,24 +56,25 @@ var app = builder.Build();
 // Configuración del pipeline HTTP
 if (app.Environment.IsDevelopment())
 {
-    app.UseSwagger(); // Habilitar Swagger en el entorno de desarrollo
-    app.UseSwaggerUI(); // Habilitar la UI de Swagger
+    app.UseSwagger();
+    app.UseSwaggerUI();
 }
 
-app.UseHttpsRedirection(); // Redirigir a HTTPS
+app.UseHttpsRedirection();
 app.UseBlazorFrameworkFiles();
 app.UseStaticFiles();
-app.UseRouting();
-app.MapRazorPages();
 
-app.UseAuthentication();
-app.UseAuthorization(); // Habilitar autorización
+app.UseRouting();
+
+//  ORDEN CORRECTO:
+app.UseAuthentication();  // Primero autenticación
+app.UseAuthorization();   // Luego autorización
 
 app.UseOutputCache();
 
-app.MapControllers(); // Mapear los controladores
-
+// Mapear endpoints DESPUÉS de autenticación/autorización
+app.MapRazorPages();
+app.MapControllers();
 app.MapFallbackToFile("index.html");
 
-// Ejecutar la aplicación
 app.Run();

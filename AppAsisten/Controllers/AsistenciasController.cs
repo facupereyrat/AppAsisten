@@ -5,7 +5,6 @@ using AutoMapper;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
-
 namespace AppAsisten.Controllers
 {
     [Route("api/Asistencia")]
@@ -21,71 +20,59 @@ namespace AppAsisten.Controllers
             this.mapper = mapper;
         }
 
-        // Registrar Entrada
-        [HttpPost("entrada")]
-        public async Task<IActionResult> RegistrarEntrada([FromBody] string codigoQR)
+        [HttpPost("registrar")]
+        public async Task<IActionResult> Registrar([FromBody] string codigoQR)
         {
+            if (string.IsNullOrWhiteSpace(codigoQR))
+                return BadRequest("Debe proporcionar un código QR.");
+
             var miembro = await context.Miembros
                 .FirstOrDefaultAsync(m => m.CodigoQR == codigoQR);
 
             if (miembro == null)
-            {
                 return BadRequest("Código QR no válido.");
-            }
 
-            var asistencia = new Asistencia
-            {
-                MiembroId = miembro.Id,
-                Entrada = DateTime.Now
-            };
+            if (!miembro.EstaActivo)
+                return BadRequest("El miembro no está activo.");
 
-            context.Asistencias.Add(asistencia);
-            await context.SaveChangesAsync();
-
-            var miembroDto = mapper.Map<MiembroDTO>(miembro);
-            var asistenciaDto = mapper.Map<AsistenciaRespuestaDTO>(asistencia);
-
-            var respuesta = new AsistenciaRespuestaDTO
-            {
-                Asistencia = asistenciaDto,
-                Miembro = miembroDto
-            };
-
-            return Ok(respuesta);  // Devolver la respuesta como AsistenciaRespuestaDTO
-        }
-
-
-        // Registrar Salida
-        [HttpPost("salida")]
-        public async Task<IActionResult> RegistrarSalida([FromBody] string codigoQR)
-        {
-            var miembro = await context.Miembros
-                .FirstOrDefaultAsync(m => m.CodigoQR == codigoQR);
-
-            if (miembro == null)
-            {
-                return BadRequest("Código QR no válido.");
-            }
-
-            var asistencia = await context.Asistencias
-                .Where(a => a.Miembro.CodigoQR == codigoQR && a.Salida == null)
-                .OrderByDescending(a => a.Entrada)   
+            // Buscar asistencia abierta (sin salida)
+            var asistenciaAbierta = await context.Asistencias
+                .Where(a => a.MiembroId == miembro.Id && a.Salida == null)
+                .OrderByDescending(a => a.Entrada)
                 .FirstOrDefaultAsync();
 
+            bool fueEntrada;
 
-            if (asistencia == null)
+            if (asistenciaAbierta == null)
             {
-                return BadRequest("No se ha registrado una entrada para este miembro.");
+                // Registrar ENTRADA
+                asistenciaAbierta = new Asistencia
+                {
+                    MiembroId = miembro.Id,
+                    Entrada = DateTime.Now
+                };
+
+                context.Asistencias.Add(asistenciaAbierta);
+                fueEntrada = true;
+            }
+            else
+            {
+                // Registrar SALIDA
+                asistenciaAbierta.Salida = DateTime.Now;
+                fueEntrada = false;
             }
 
-            asistencia.Salida = DateTime.Now;
             await context.SaveChangesAsync();
 
             var miembroDto = mapper.Map<MiembroDTO>(miembro);
-            var asistenciaDto = mapper.Map<AsistenciaRespuestaDTO>(asistencia);
 
-            return Ok(new { Asistencia = asistenciaDto, Miembro = miembroDto });
+            return Ok(new AsistenciaRespuestaDTO
+            {
+                Miembro = miembroDto,
+                Entrada = asistenciaAbierta.Entrada,
+                Salida = asistenciaAbierta.Salida,
+                EsEntrada = fueEntrada
+            });
         }
     }
 }
-

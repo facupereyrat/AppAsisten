@@ -67,5 +67,10 @@ namespace AppAsist.Client.Autorizacion
             httpClient.DefaultRequestHeaders.Authorization = null;
             NotifyAuthenticationStateChanged(Task.FromResult(Anonimo));
         }
+
+        public async Task<string?> ObtenerToken()
+        {
+            return await js.ObtenerDeLocalStorage(TOKENKEY) as string;
+        }
     }
 }

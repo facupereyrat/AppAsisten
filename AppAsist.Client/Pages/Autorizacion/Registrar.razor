@@ -1,35 +1,43 @@
-﻿@page "/registrar"
-@using AppAsist.Client.Autorizacion
+﻿@page "/registrar-miembro"
 @using AppAsisten.Shared.DTO
 @inject IHttpServicio http
 @inject NavigationManager navigationManager
 @inject IJSRuntime js
-@inject ILoginService loginService
 
-<h3>Registrar</h3>
+<h3>Registrar Miembro</h3>
 
-<EditForm Model="userInfo" OnValidSubmit="CrearUsuario">
+<EditForm Model="miembroInfo" OnValidSubmit="RegistrarMiembro">
     <DataAnnotationsValidator />
 
     <div class="mb-3">
-        <label for="email" class="form-label">Email:</label>
-        <InputText id="email" class="form-control" @bind-Value="userInfo.Email" />
-        <ValidationMessage For="@(() => userInfo.Email)" />
+        <label for="nombre" class="form-label">Nombre:</label>
+        <InputText id="nombre" class="form-control" @bind-Value="miembroInfo.Nombre" />
+        <ValidationMessage For="@(() => miembroInfo.Nombre)" />
     </div>
-    <div class="mb-3">
-        <label for="password" class="form-label">Password</label>
-        <InputText id="password" type="password" class="form-control" @bind-Value="userInfo.Password" />
-        <ValidationMessage For="@(() => userInfo.Password)" />
+
+    <div class="form-check mb-3">
+        <InputCheckbox id="activo" class="form-check-input" @bind-Value="miembroInfo.EstaActivo" />
+        <label for="activo" class="form-check-label">Activo</label>
     </div>
+
     <button type="submit" class="btn btn-primary">Registrar</button>
 </EditForm>
 
-@code {
-    private UserInfoDTO userInfo = new UserInfoDTO();
+@if (!string.IsNullOrEmpty(codigoGenerado))
+{
+    <div class="alert alert-success mt-3">
+        <strong>Miembro registrado con éxito.</strong><br />
+        Tu código de asistencia es: <b>@codigoGenerado</b>
+    </div>
+}
 
-    private async Task CrearUsuario()
+@code {
+    private MiembroDTO miembroInfo = new MiembroDTO();
+    private string codigoGenerado;
+
+    private async Task RegistrarMiembro()
     {
-        var httpRespuesta = await http.Post<UserInfoDTO, UserTokenDTO>("usuarios/registrar", userInfo);
+        var httpRespuesta = await http.Post<MiembroDTO, MiembroDTO>("api/Miembro/registrar-miembro", miembroInfo);
         if (httpRespuesta.Error)
         {
             var msg = await httpRespuesta.ObtenerError();
@@ -37,16 +45,8 @@
         }
         else
         {
-            var userToken = httpRespuesta.Respuesta as UserTokenDTO;
-            if (userToken != null)
-            {
-                await loginService.Login(userToken);
-                navigationManager.NavigateTo("/");
-            }
-            else
-            {
-                await js.Confirmar("No se pudo obtener el token");
-            }
+            var miembroRegistrado = httpRespuesta.Respuesta;
+            codigoGenerado = miembroRegistrado.CodigoQR; // Mostrar el código numérico generado
         }
     }
 }

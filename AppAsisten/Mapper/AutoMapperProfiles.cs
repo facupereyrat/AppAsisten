@@ -10,25 +10,24 @@ namespace AppAsisten.Server.Mapper
         {
             // Mapeo de Miembro a MiembroDTO
             CreateMap<Miembro, MiembroDTO>()
-                .ForMember(dest => dest.MiembroId, opt => opt.MapFrom(src => src.Id)) // Asumiendo que 'Id' es la propiedad base de EntityBase
+                .ForMember(dest => dest.MiembroId, opt => opt.MapFrom(src => src.Id))
                 .ForMember(dest => dest.Nombre, opt => opt.MapFrom(src => src.Nombre))
                 .ForMember(dest => dest.CodigoQR, opt => opt.MapFrom(src => src.CodigoQR))
                 .ForMember(dest => dest.EstaActivo, opt => opt.MapFrom(src => src.EstaActivo));
 
-            // Mapeo de Asistencia a AsistenciaDTO
+            // Mapeo de Asistencia a AsistenciaRespuestaDTO SIN MiembroId
             CreateMap<Asistencia, AsistenciaRespuestaDTO>()
-                .ForMember(dest => dest.MiembroId, opt => opt.MapFrom(src => src.MiembroId))
                 .ForMember(dest => dest.Entrada, opt => opt.MapFrom(src => src.Entrada ?? default))
-                .ForMember(dest => dest.Salida, opt => opt.MapFrom(src => src.Salida)); // Mapea la fecha de salida, si existe
+                .ForMember(dest => dest.Salida, opt => opt.MapFrom(src => src.Salida));
 
-            // Mapeo inverso (opcional, si deseas mapear de DTO a entidad)
+            // Mapeo inverso MiembroDTO a Miembro
             CreateMap<MiembroDTO, Miembro>()
                 .ForMember(dest => dest.Nombre, opt => opt.MapFrom(src => src.Nombre))
                 .ForMember(dest => dest.CodigoQR, opt => opt.MapFrom(src => src.CodigoQR))
                 .ForMember(dest => dest.EstaActivo, opt => opt.MapFrom(src => src.EstaActivo));
 
+            // Mapeo inverso AsistenciaRespuestaDTO a Asistencia SIN MiembroId
             CreateMap<AsistenciaRespuestaDTO, Asistencia>()
-                .ForMember(dest => dest.MiembroId, opt => opt.MapFrom(src => src.MiembroId))
                 .ForMember(dest => dest.Entrada, opt => opt.MapFrom(src => src.Entrada))
                 .ForMember(dest => dest.Salida, opt => opt.MapFrom(src => src.Salida));
         }

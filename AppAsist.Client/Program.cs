@@ -14,6 +14,7 @@ builder.RootComponents.Add<HeadOutlet>("head::after");
 // Registrar el HttpClient
 builder.Services.AddSingleton(sp => new HttpClient { BaseAddress = new Uri(builder.HostEnvironment.BaseAddress) });
 builder.Services.AddAuthorizationCore();
+builder.Services.AddCascadingAuthenticationState();
 
 // Registrar IHttpServicio con su implementación HttpServicio
 builder.Services.AddScoped<IHttpServicio, HttpServicio>();

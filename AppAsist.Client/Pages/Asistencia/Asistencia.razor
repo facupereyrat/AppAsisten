@@ -1,75 +1,74 @@
-﻿@page "/api/asistencia"
+﻿@page "/asistencia"
 @inject HttpClient Http
 @using AppAsisten.Shared.DTO
 @using System.Net.Http.Json
 
 <h3>Registrar Asistencia</h3>
 
-<div>
+<div class="mb-3">
     <label for="codigoQR">Código QR:</label>
     <input type="text" id="codigoQR" @bind="codigoQR" class="form-control" />
 </div>
 
-<div class="mt-3">
-    <button class="btn btn-primary" @onclick="RegistrarEntrada">Registrar Entrada</button>
-    <button class="btn btn-secondary" @onclick="RegistrarSalida">Registrar Salida</button>
+<div class="mb-3">
+    <button class="btn btn-primary" @onclick="Registrar">Registrar</button>
 </div>
+
+@if (!string.IsNullOrEmpty(mensajeError))
+{
+    <div class="alert alert-danger">
+        @mensajeError
+    </div>
+}
 
 @if (asistenciaRespuesta != null)
 {
-    <div class="mt-3">
-        <h4>Detalles de Asistencia</h4>
-        <p><strong>Miembro:</strong> @asistenciaRespuesta.Miembro.Nombre</p>
-        <p><strong>Entrada:</strong> @asistenciaRespuesta.Asistencia.Entrada</p>
-        <p><strong>Salida:</strong> @asistenciaRespuesta.Asistencia.Salida "No registrada aún"</p>
+    <div class="mt-3 alert alert-success">
+        <h5>
+            @(asistenciaRespuesta.EsEntrada
+                    ? "Entrada registrada correctamente" 
+                                    : "Salida registrada correctamente")
+        </h5>
+
+        <p><strong>Miembro:</strong> @asistenciaRespuesta.Miembro?.Nombre</p>
+        <p><strong>Entrada:</strong> @asistenciaRespuesta.Entrada</p>
+        <p>
+            <strong>Salida:</strong>
+            @(asistenciaRespuesta.Salida?.ToString() ?? "No registrada aún")
+        </p>
     </div>
 }
 
 @code {
     private string codigoQR;
     private AsistenciaRespuestaDTO asistenciaRespuesta;
+    private string mensajeError;
 
-    // Registrar Entrada
-    private async Task RegistrarEntrada()
+    private async Task Registrar()
     {
-        if (string.IsNullOrEmpty(codigoQR))
-        {
+        mensajeError = null;
+        asistenciaRespuesta = null;
+
+        if (string.IsNullOrWhiteSpace(codigoQR))
             return;
-        }
 
-        var response = await Http.PostAsJsonAsync("api/Asistencia/entrada", codigoQR);
+        try
+        {
+            var response = await Http.PostAsJsonAsync("api/Asistencia/registrar", codigoQR);
 
-        if (response.IsSuccessStatusCode)
-        {
-            asistenciaRespuesta = await response.Content.ReadFromJsonAsync<AsistenciaRespuestaDTO>();
+            if (response.IsSuccessStatusCode)
+            {
+                asistenciaRespuesta = await response.Content.ReadFromJsonAsync<AsistenciaRespuestaDTO>();
+                codigoQR = string.Empty;
+            }
+            else
+            {
+                mensajeError = await response.Content.ReadAsStringAsync();
+            }
         }
-        else
+        catch (Exception ex)
         {
-            asistenciaRespuesta = null;
-            var errorMessage = await response.Content.ReadAsStringAsync();
-            Console.WriteLine($"Error: {errorMessage}");
-        }
-    }
-
-    // Registrar Salida
-    private async Task RegistrarSalida()
-    {
-        if (string.IsNullOrEmpty(codigoQR))
-        {
-            return;
-        }
-
-        var response = await Http.PostAsJsonAsync("api/Asistencia/salida", codigoQR);
-
-        if (response.IsSuccessStatusCode)
-        {
-            asistenciaRespuesta = await response.Content.ReadFromJsonAsync<AsistenciaRespuestaDTO>();
-        }
-        else
-        {
-            asistenciaRespuesta = null;
-            var errorMessage = await response.Content.ReadAsStringAsync();
-            Console.WriteLine($"Error: {errorMessage}");
+            mensajeError = $"Error al registrar: {ex.Message}";
         }
     }
 }
